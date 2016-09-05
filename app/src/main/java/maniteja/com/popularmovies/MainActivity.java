@@ -1,13 +1,11 @@
 package maniteja.com.popularmovies;
 
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
-import maniteja.com.popularmovies.dummy.DummyContent;
-
-public class MainActivity extends AppCompatActivity implements MovieListFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +20,5 @@ public class MainActivity extends AppCompatActivity implements MovieListFragment
 
     }
 
-    @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
 
-    }
 }

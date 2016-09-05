@@ -2,4 +2,7 @@
     <string name="app_name">PopularMovies</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="action_settings">Settings</string>
+
+    <!--api key-->
+    <string name="api_key">aecc2347f8d4d96c8ecf22a2c4c20213</string>
 </resources>
