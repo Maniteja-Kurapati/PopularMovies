@@ -22,7 +22,7 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
     private List<Movie> mMovieList;
     private Context mContext;
     private String baseUrl="http://image.tmdb.org/t/p";
-    private String imageQuality="w185";
+    private String imageQuality="w500";
 
 
     public MovieAdapter(Context context, int resource, List<Movie> movieList) {

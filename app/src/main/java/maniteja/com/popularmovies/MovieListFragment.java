@@ -1,6 +1,7 @@
 package maniteja.com.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -49,11 +51,22 @@ public class MovieListFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         //Inflate layout
         View rootView=inflater.inflate(R.layout.fargment_movie_list,container,false);
-        List<Movie> movieList =new ArrayList<Movie>();
+        final List<Movie> movieList =new FetchMoviesTask().getMovieList();
         //Intialize adapter
         movieAdapter=new MovieAdapter(getContext(),R.layout.image_view,movieList);
         sortMovieListByPopularity();
         GridView gridView=(GridView)rootView.findViewById(R.id.gridView_movies);
+
+        //Listener on GridView
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent=new Intent(getActivity(),DetailActivity.class);
+                intent.putExtra("EXTRA_MOVIE",movieList.get(position));
+                startActivity(intent);
+
+            }
+        });
         gridView.setAdapter(movieAdapter);
         return rootView;
     }
@@ -111,6 +124,7 @@ public class MovieListFragment extends Fragment {
 
     private class FetchMoviesTask extends AsyncTask<String,Void,String>
     {
+        private List<Movie> movieList=new ArrayList<Movie>();
 
         @Override
         protected String doInBackground(String... params) {
@@ -124,11 +138,16 @@ public class MovieListFragment extends Fragment {
 
         }
 
+        public List<Movie> getMovieList()
+        {
+            return movieList;
+        }
+
         @Override
         protected void onPostExecute(String moviesJson) {
             super.onPostExecute(moviesJson);
             try {
-                List<Movie> movieList=getMovieObjects(moviesJson);
+                movieList=getMovieObjects(moviesJson);
                 movieAdapter.clear();
                 movieAdapter.addAll(movieList);
 

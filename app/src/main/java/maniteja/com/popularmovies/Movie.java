@@ -1,9 +1,12 @@
 package maniteja.com.popularmovies;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by maniteja on 9/4/2016.
  */
-public class Movie {
+public class Movie implements Parcelable {
 
     private String posterPath;
     private String title;
@@ -62,4 +65,44 @@ public class Movie {
     }
 
 
+
+    protected Movie(Parcel in) {
+        posterPath = in.readString();
+        title = in.readString();
+        releaseDate = in.readString();
+        overview = in.readString();
+        rating = in.readByte() == 0x00 ? null : in.readDouble();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(posterPath);
+        dest.writeString(title);
+        dest.writeString(releaseDate);
+        dest.writeString(overview);
+        if (rating == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeDouble(rating);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
