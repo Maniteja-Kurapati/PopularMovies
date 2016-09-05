@@ -9,9 +9,9 @@ public class Movie {
     private String title;
     private String releaseDate;
     private String overview;
-    private float rating;
+    private Double rating;
 
-    public Movie(String posterPath, String title, String releaseDate, String overview, float rating) {
+    public Movie(String posterPath, String title, String releaseDate, String overview, Double rating) {
         this.posterPath = posterPath;
         this.title = title;
         this.releaseDate = releaseDate;
@@ -53,11 +53,11 @@ public class Movie {
         this.overview = overview;
     }
 
-    public float getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 

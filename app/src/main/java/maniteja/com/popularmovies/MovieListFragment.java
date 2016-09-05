@@ -8,17 +8,35 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by maniteja on 9/4/2016.
  */
 public class MovieListFragment extends Fragment {
+    public static final String LOG_TAG=MovieListFragment.class.getSimpleName();
+    MovieAdapter movieAdapter;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +49,12 @@ public class MovieListFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         //Inflate layout
         View rootView=inflater.inflate(R.layout.fargment_movie_list,container,false);
+        List<Movie> movieList =new ArrayList<Movie>();
+        //Intialize adapter
+        movieAdapter=new MovieAdapter(getContext(),R.layout.image_view,movieList);
+        sortMovieListByPopularity();
+        GridView gridView=(GridView)rootView.findViewById(R.id.gridView_movies);
+        gridView.setAdapter(movieAdapter);
         return rootView;
     }
 
@@ -59,14 +83,17 @@ public class MovieListFragment extends Fragment {
     {
         String baseUrl="http://api.themoviedb.org/3/movie/popular";
         Uri popularMoviesUri=Uri.parse(baseUrl).buildUpon().appendQueryParameter("api_key",getString(R.string.api_key)).build();
-        new FetchMoviesTask().execute(popularMoviesUri);
+        String popularUrl =popularMoviesUri.toString();
+        Log.d(LOG_TAG,popularUrl);
+        new FetchMoviesTask().execute(popularUrl);
 
     }
     public void sortMovieListByTopRating()
     {
         String baseUrl="http://api.themoviedb.org/3/movie/top_rated";
         Uri TopRatedMoviesUri=Uri.parse(baseUrl).buildUpon().appendQueryParameter("api_key",getString(R.string.api_key)).build();
-        new FetchMoviesTask().execute(TopRatedMoviesUri);
+        String topRatedUrl=TopRatedMoviesUri.toString();
+        new FetchMoviesTask().execute(topRatedUrl);
 
     }
 
@@ -82,16 +109,99 @@ public class MovieListFragment extends Fragment {
         return false;
     }
 
-    private class FetchMoviesTask extends AsyncTask<Uri,Void,String>
+    private class FetchMoviesTask extends AsyncTask<String,Void,String>
     {
+
         @Override
-        protected String doInBackground(Uri... params) {
-            return null;
+        protected String doInBackground(String... params) {
+            String urlToFetch=params[0];
+            try {
+                return fetchMovieList(urlToFetch);
+            }catch (IOException e){
+                return "unable to fetch movies.Invalid Url.";
+
+            }
+
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(String moviesJson) {
+            super.onPostExecute(moviesJson);
+            try {
+                List<Movie> movieList=getMovieObjects(moviesJson);
+                movieAdapter.clear();
+                movieAdapter.addAll(movieList);
+
+            }catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+
+        }
+
+        private List<Movie> getMovieObjects(String string)throws JSONException
+        {
+
+            List<Movie> movieList=new ArrayList<Movie>();
+            JSONObject popularMoviesObject=new JSONObject(string);
+            JSONArray resultsArray=popularMoviesObject.getJSONArray("results");
+            for (int i=0;i<resultsArray.length();i++)
+            {
+                JSONObject object=resultsArray.getJSONObject(i);
+                String posterPath=object.getString("poster_path");
+                String title=object.getString("original_title");
+                String overview =object.getString("overview");
+                String releaseDate=object.getString("release_date");
+                Double rating=object.getDouble("vote_average");
+                Movie movie=new Movie(posterPath,title,releaseDate,overview,rating);
+                movieList.add(movie);
+
+
+            }
+            return movieList;
+        }
+
+        private String  fetchMovieList(String url) throws IOException
+        {
+            InputStream inputStream=null;
+            URL url1=new URL(url);
+
+            try {
+                HttpURLConnection connection=(HttpURLConnection)url1.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(15000);
+                connection.connect();
+                int response=connection.getResponseCode();
+                inputStream=connection.getInputStream();
+                String streamAsString = streamToString(inputStream);
+                return streamAsString;
+
+
+            }finally {
+                if(inputStream!=null)
+                {
+                    inputStream.close();
+                }
+            }
+
+        }
+
+        private String streamToString(InputStream inputStream)throws IOException,UnsupportedEncodingException{
+            BufferedReader reader=null;
+            StringBuffer buffer=new StringBuffer();
+            reader=new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line=reader.readLine())!=null)
+            {
+                buffer.append(line+"/n");
+
+            }
+            Log.d(LOG_TAG,new String(buffer));
+            return new String(buffer);
+
         }
     }
 }
