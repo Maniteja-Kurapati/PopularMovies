@@ -56,7 +56,7 @@ public class DetailActivityFragment extends Fragment {
         //Bind data to views
         titleView.setText(movie.getTitle());
         releaseDateView.setText(movie.getReleaseDate());
-        ratingView.setText(movie.getRating().toString());
+        ratingView.setText(movie.getRating().toString()+"/10");
         overviewView.setText(movie.getOverview());
 
         //load image

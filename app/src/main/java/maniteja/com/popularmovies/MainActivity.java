@@ -12,11 +12,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MovieListFragment movieListFragment=new MovieListFragment();
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction transaction=manager.beginTransaction();
-        transaction.add(R.id.movieFragment_container,movieListFragment);
-        transaction.commit();
+        if(savedInstanceState==null)
+        {
+            MovieListFragment movieListFragment=new MovieListFragment();
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction=manager.beginTransaction();
+            transaction.add(R.id.movieFragment_container,movieListFragment);
+            transaction.commit();
+
+        }
+
 
     }
 

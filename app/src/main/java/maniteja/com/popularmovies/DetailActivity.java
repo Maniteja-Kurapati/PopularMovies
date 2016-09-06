@@ -12,10 +12,15 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        DetailActivityFragment fragment=new DetailActivityFragment();
-        FragmentManager manager=getSupportFragmentManager();
-        FragmentTransaction transaction=manager.beginTransaction().add(R.id.detailFragment_container,fragment);
-        transaction.commit();
+        if(savedInstanceState==null)
+        {
+            DetailActivityFragment fragment=new DetailActivityFragment();
+            FragmentManager manager=getSupportFragmentManager();
+            FragmentTransaction transaction=manager.beginTransaction().add(R.id.detailFragment_container,fragment);
+            transaction.commit();
+        }
+
+
     }
 
 }
